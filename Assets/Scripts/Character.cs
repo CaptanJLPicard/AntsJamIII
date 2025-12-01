@@ -5,7 +5,6 @@ public class Character : MonoBehaviour
 {
     [Header("Refenrences")]
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private Transform enemyBase;  
     [SerializeField] private Animator animator;
     private CapsuleCollider2D gameObjectCollider;
     private SpriteRenderer gameObjectSprite;
@@ -22,6 +21,7 @@ public class Character : MonoBehaviour
     [SerializeField] private float attackTimer;
     [SerializeField] private float damage = 10f;
     [SerializeField] private float health = 100f;
+    [SerializeField] private int characterType; // Default = 0 //Ates = 1 //Su = 2 // Toprak = 3 // Hava = 4 //Elektrik
 
     private float currentCharacterSpeed;
     private bool isStopping;
@@ -109,7 +109,7 @@ public class Character : MonoBehaviour
                     Character enemy = hit.collider.GetComponent<Character>();
                     if (enemy != null)
                     {
-                        enemy.Damage(damage);
+                        enemy.Damage(damage, characterType);
                         attackSound?.PlayFeedbacks();
                     }
 
@@ -145,9 +145,153 @@ public class Character : MonoBehaviour
         }
     }
 
-    public void Damage(float damageAmount)
+    public void Damage(float damageAmount, int enemyCharacterType)
     {
-        health -= damageAmount;
+        float baseDamage = health -= damageAmount;
+        switch (characterType)
+         {
+            case 0: // Default
+                switch (enemyCharacterType)
+                {
+                    case 0:
+                        health -= baseDamage * 1f;
+                        break;
+                    case 1:
+                        health -= baseDamage * 2f;
+                        break;
+                    case 2:
+                        health -= baseDamage * 2f;
+                        break;
+                    case 3:
+                        health -= baseDamage * 2f;
+                        break;
+                    case 4:
+                        health -= baseDamage * 2f;
+                        break;
+                    case 5:
+                        health -= baseDamage * 2f;
+                        break;
+                }
+                break;
+            case 1: //Ates
+                switch (enemyCharacterType)
+                {
+                    case 0:
+                        health -= baseDamage * 0.25f;
+                        break;
+                    case 1:
+                        health -= baseDamage * 1f;
+                        break;
+                    case 2:
+                        health -= baseDamage * 0.5f;
+                        break;
+                    case 3:
+                        health -= baseDamage * 2f;
+                        break;
+                    case 4:
+                        health -= baseDamage * 1.5f;
+                        break;
+                    case 5:
+                        health -= baseDamage * 0.75f;
+                        break;
+                }
+                break;
+            case 2: //Su
+                switch (enemyCharacterType)
+                {
+                    case 0:
+                        health -= baseDamage * 0.25f;
+                        break;
+                    case 1:
+                        health -= baseDamage * 2f;
+                        break;
+                    case 2:
+                        health -= baseDamage * 1f;
+                        break;
+                    case 3:
+                        health -= baseDamage * 1.5f;
+                        break;
+                    case 4:
+                        health -= baseDamage * 0.75f;
+                        break;
+                    case 5:
+                        health -= baseDamage * 0.5f;
+                        break;
+                }
+                break;
+            case 3: //Toprak
+                switch (enemyCharacterType)
+                {
+                    case 0:
+                        health -= baseDamage * 1f;
+                        break;
+                    case 1:
+                        health -= baseDamage * 1.5f;
+                        break;
+                    case 2:
+                        health -= baseDamage * 0.5f;
+                        break;
+                    case 3:
+                        health -= baseDamage * 1f;
+                        break;
+                    case 4:
+                        health -= baseDamage * 0.75f;
+                        break;
+                    case 5:
+                        health -= baseDamage * 2f;
+                        break;
+                }
+                break;
+            case 4: //Hava
+                switch (enemyCharacterType)
+                {
+                    case 0:
+                        health -= baseDamage * 0.25f;
+                        break;
+                    case 1:
+                        health -= baseDamage * 0.75f;
+                        break;
+                    case 2:
+                        health -= baseDamage * 2f;
+                        break;
+                    case 3:
+                        health -= baseDamage * 0.5f;
+                        break;
+                    case 4:
+                        health -= baseDamage * 1f;
+                        break;
+                    case 5:
+                        health -= baseDamage * 1.5f;
+                        break;
+                }
+                break;
+            case 5: //Elektrik
+                switch (enemyCharacterType)
+                {
+                    case 0:
+                        health -= baseDamage * 0.25f;
+                        break;
+                    case 1:
+                        health -= baseDamage * 0.75f;
+                        break;
+                    case 2:
+                        health -= baseDamage * 1.5f;
+                        break;
+                    case 3:
+                        health -= baseDamage * 0.5f;
+                        break;
+                    case 4:
+                        health -= baseDamage * 2f;
+                        break;
+                    case 5:
+                        health -= baseDamage * 1f;
+                        break;
+                }
+                break;
+            default:
+                health -= baseDamage * 1f;
+                break;
+        }
     }
 
     private void AnimatorController()

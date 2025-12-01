@@ -4,7 +4,7 @@ public class Spawner : MonoBehaviour
 {
     [Header("Refenrences")]
     [SerializeField] private GameObject[] spawnerPrefabs;
-    private int currentSoliderIndex;  // Default = 0 //Ates = 1 //Su = 2 // Bitki = 3 // Hava = 4
+    private int currentSoliderIndex;  // Default = 0 //Ates = 1 //Su = 2 // Toprak = 3 // Hava = 4 //Elektrik = 5
     
     [Header("Variables")]
     [SerializeField] private float currentSpawnTime;

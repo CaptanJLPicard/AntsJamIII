@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -23,6 +23,9 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
     public List<GameObject> currentObjects = new List<GameObject>();
 
     private List<bool> previousCombination;
+
+    [SerializeField] private int currentComboIndex = 0;
+    [SerializeField] private Spawner spawner;
 
     private void Awake()
     {
@@ -51,15 +54,27 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
 
     private void CheckCombination()
     {
-        foreach (var combo in combinations) combo.isThisOk = false;
-        foreach (var combo in combinations)
+        ResetCombinationState();
+
+        for (int i = 0; i < combinations.Count; i++)
         {
+            var combo = combinations[i];
+
             if (currentCombination.SequenceEqual(combo.combination))
             {
                 combo.isThisOk = true;
+                currentComboIndex = i;
                 return;
             }
         }
+    }
+
+    private void ResetCombinationState()
+    {
+        foreach (var combo in combinations)
+            combo.isThisOk = false;
+
+        currentComboIndex = 0;
     }
 
     #region Buttons
@@ -79,6 +94,15 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
         currentCombination.Clear();
         currentObjects.Clear();
         currentCombination = new List<bool>(new bool[8]);
+
+        ResetCombinationState();
+    }
+
+    public void Spawn()
+    {
+        spawner.ChangeSpawnIndex(currentComboIndex);
+        ResetSpeel();
+        ResetCombinationState();
     }
     #endregion
 }

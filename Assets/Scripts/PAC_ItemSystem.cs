@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     [SerializeField] private int index;
-
     private PAC_CraftSystem craftSystem;
     private Image image;
     private Canvas canvas;
@@ -29,13 +28,9 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
         draggedObject.name = gameObject.name + "_Dragged";
 
         PAC_ItemSystem draggedScript = draggedObject.GetComponent<PAC_ItemSystem>();
-
         eventData.pointerDrag = draggedObject;
         draggedScript.cGroup.alpha = 0.6f;
         draggedScript.cGroup.blocksRaycasts = false;
-
-        //cGroup.alpha = 0.6f;
-        //cGroup.blocksRaycasts = false;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -49,9 +44,30 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
             eventData.pointerEnter.gameObject.CompareTag("Boiler") &&
             craftSystem.currentObjects.Count < 8)
         {
+            string cleanName = gameObject.name.Replace("_Dragged", "");
+
+            bool alreadyExists = false;
+            foreach (var item in craftSystem.currentObjects)
+            {
+                string itemCleanName = item.name.Replace("_Dragged", "");
+                if (itemCleanName == cleanName)
+                {
+                    alreadyExists = true;
+                    break;
+                }
+            }
+
+            if (alreadyExists)
+            {
+                Debug.Log("Bu item zaten var, eklenmiyor.");
+                Destroy(gameObject);
+                return;
+            }
+
             craftSystem.currentObjects.Add(gameObject);
             craftSystem.contentsTxt.text = "Contents: " + craftSystem.currentObjects.Count;
             craftSystem.currentCombination[index] = true;
+
             cGroup.alpha = 1f;
             cGroup.blocksRaycasts = true;
             StartCoroutine(FadeOut());
@@ -66,7 +82,6 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
             Destroy(gameObject);
         }
     }
-
 
     private System.Collections.IEnumerator FadeOut()
     {
