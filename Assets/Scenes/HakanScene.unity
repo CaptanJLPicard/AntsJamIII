@@ -2923,28 +2923,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   contentsTxt: {fileID: 1388340482}
+  chaos: 0
+  minChaos: 0
+  maxChaos: 100
+  increaseChaosSpeed: 1
   combinations:
   - spellName: "DefaultKotuIks\u0131r"
     combination: 0101010101010101
     isThisOk: 0
+    hwmuchChaos: 0
   - spellName: AtesIksiri
     combination: 0100000001000001
     isThisOk: 0
+    hwmuchChaos: 15
   - spellName: ToprakIksiri
     combination: 0101000000010000
     isThisOk: 0
+    hwmuchChaos: 25
   - spellName: SuIksiri
     combination: 0000010100010100
     isThisOk: 0
+    hwmuchChaos: 20
   - spellName: HavaIksiri
     combination: 0000010100000100
     isThisOk: 0
+    hwmuchChaos: 50
   - spellName: ElektrikIksiri
     combination: 0101010000000001
     isThisOk: 0
+    hwmuchChaos: 60
   currentCombination: 0000000000000000
   currentObjects: []
-  currentComboIndex: -1
+  currentComboIndex: 0
   spawner: {fileID: 2091929707}
 --- !u!1 &1608494121
 GameObject:

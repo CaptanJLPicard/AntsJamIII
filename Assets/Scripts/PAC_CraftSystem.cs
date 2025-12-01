@@ -4,11 +4,18 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using VInspector;
+using static PAC_CraftSystem;
 
 public class PAC_CraftSystem : MonoBehaviour, IDropHandler
 {
     [Header("Get Variables")]
     public TextMeshProUGUI contentsTxt;
+
+    [Header("Set Variables")]
+    [ReadOnly] public float chaos;
+    [SerializeField] private float minChaos = 0f;
+    [SerializeField] private float maxChaos = 100f;
+    [SerializeField, Range(1, 5)] private float increaseChaosSpeed = 1f;
 
     [System.Serializable]
     public class Combinations
@@ -16,6 +23,7 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
         public string spellName;
         public List<bool> combination;
         public bool isThisOk = false;
+        public float hwmuchChaos;
     }
 
     [SerializeField] private List<Combinations> combinations;
@@ -30,6 +38,8 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
     private void Awake()
     {
         previousCombination = new List<bool>();
+        minChaos = 0;
+        chaos = maxChaos;
         ResetSpeel();
     }
 
@@ -50,6 +60,9 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
             CheckCombination();
             previousCombination = new List<bool>(currentCombination);
         }
+
+        if (chaos < maxChaos) chaos += Time.deltaTime * increaseChaosSpeed;
+        chaos = Mathf.Clamp(chaos, minChaos, maxChaos);
     }
 
     private void CheckCombination()
@@ -100,6 +113,9 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
 
     public void Spawn()
     {
+        if (currentComboIndex == 0 && chaos >= 35f) chaos -= 35f;
+        else if (currentComboIndex != 0 && chaos >= combinations[currentComboIndex].hwmuchChaos) chaos -= combinations[currentComboIndex].hwmuchChaos;
+        else return;
         spawner.ChangeSpawnIndex(currentComboIndex);
         ResetSpeel();
         ResetCombinationState();
