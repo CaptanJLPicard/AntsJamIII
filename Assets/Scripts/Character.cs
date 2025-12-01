@@ -1,5 +1,6 @@
 using UnityEngine;
 using MoreMountains.Feedbacks;
+using UnityEngine.UI;
 
 public class Character : MonoBehaviour
 {
@@ -32,6 +33,10 @@ public class Character : MonoBehaviour
     [SerializeField] private MMF_Player attackSound;   
     [SerializeField] private MMF_Player deathEffects;
 
+    [Header("UI")]
+    [SerializeField] private Slider healthSlider;
+    private float maxHealth;
+
     private void Start()
     {
         if (!rb) rb = GetComponent<Rigidbody2D>();
@@ -40,6 +45,13 @@ public class Character : MonoBehaviour
         gameObjectSprite = GetComponent<SpriteRenderer>();
 
         attackTimer = attackSpeed;
+
+        maxHealth = health;
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = health;
+        }
     }
 
     private void Update()
@@ -50,6 +62,7 @@ public class Character : MonoBehaviour
         Attack();
         AnimatorController();
         HealthCheck();
+        UpdateHealthUI();
     }
 
     private void Movement()
@@ -113,6 +126,12 @@ public class Character : MonoBehaviour
                         attackSound?.PlayFeedbacks();
                     }
 
+                    BaseScripts baseSc = hit.collider.GetComponent<BaseScripts>();
+                    if(baseSc != null)
+                    {
+                        baseSc.BaseDamage(damage);
+                    }
+
                     attackTimer = attackSpeed;
                 }
             }
@@ -144,6 +163,15 @@ public class Character : MonoBehaviour
             Destroy(gameObject , 3f);
         }
     }
+
+    private void UpdateHealthUI()
+    {
+        if (healthSlider != null)
+        {
+            healthSlider.value = health;
+        }
+    }
+
 
     public void Damage(float damageAmount, int enemyCharacterType)
     {
