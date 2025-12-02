@@ -2,13 +2,16 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    [Header("Refenrences")]
+    [Header("References")]
     [SerializeField] private GameObject[] spawnerPrefabs;
-    private int currentSoliderIndex;  // Default = 0 //Ates = 1 //Su = 2 // Toprak = 3 // Hava = 4 //Elektrik = 5
-    
-    [Header("Variables")]
+
+    [Header("Spawn Settings")]
+    [SerializeField] private float spawnTime = 3f;
     [SerializeField] private float currentSpawnTime;
-    [SerializeField] private float spawnTime;
+
+    [Header("Current State")]
+    [SerializeField] private int currentSoldierIndex = 0;
+    [SerializeField] private float pendingMultiplier = 1f;
 
     private void Start()
     {
@@ -28,13 +31,52 @@ public class Spawner : MonoBehaviour
 
     public void ChangeSpawnIndex(int index)
     {
-        currentSoliderIndex = index;
-        if (index != 0) currentSpawnTime = 0;
+        currentSoldierIndex = Mathf.Clamp(index, 0, spawnerPrefabs.Length - 1);
+
+        if (index != 0)
+        {
+            currentSpawnTime = 0;
+        }
+    }
+
+    public void SpawnWithMultiplier(int index, float multiplier)
+    {
+        currentSoldierIndex = Mathf.Clamp(index, 0, spawnerPrefabs.Length - 1);
+        pendingMultiplier = multiplier;
+        currentSpawnTime = 0;
     }
 
     private void CharacterSpawn()
     {
-        Instantiate(spawnerPrefabs[currentSoliderIndex], transform.position, Quaternion.identity);
-        currentSoliderIndex = 0;
+        if (spawnerPrefabs == null || spawnerPrefabs.Length == 0)
+        {
+            Debug.LogWarning("Spawner prefabs empty!");
+            return;
+        }
+
+        if (currentSoldierIndex >= spawnerPrefabs.Length)
+        {
+            Debug.LogWarning($"Invalid soldier index: {currentSoldierIndex}");
+            currentSoldierIndex = 0;
+        }
+
+        GameObject spawnedSoldier = Instantiate(
+            spawnerPrefabs[currentSoldierIndex],
+            transform.position,
+            Quaternion.identity
+        );
+
+        // Character script'ine multiplier uygula
+        Character character = spawnedSoldier.GetComponent<Character>();
+        if (character != null)
+        {
+            character.ApplyMultiplier(pendingMultiplier);
+        }
+
+        // Reset
+        currentSoldierIndex = 0;
+        pendingMultiplier = 1f;
     }
+
+    public int GetPrefabCount() => spawnerPrefabs?.Length ?? 0;
 }

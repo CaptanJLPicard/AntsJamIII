@@ -1,11 +1,13 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
+    [Header("Item Identity")]
     [SerializeField] private int index;
+    [SerializeField] private string itemName;
+
     private PAC_CraftSystem craftSystem;
     private Image image;
     private Canvas canvas;
@@ -19,17 +21,29 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
         image = GetComponent<Image>();
         cGroup = GetComponent<CanvasGroup>();
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+
+        if (string.IsNullOrEmpty(itemName))
+            itemName = gameObject.name;
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        Debug.Log($"OnPointerDown: {itemName}");
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         GameObject draggedObject = Instantiate(gameObject, transform.position, Quaternion.identity);
-        draggedObject.transform.SetParent(transform.parent);
-        draggedObject.name = gameObject.name + "_Dragged";
+        draggedObject.transform.SetParent(canvas.transform);
+        draggedObject.name = itemName + "_Dragged";
 
         PAC_ItemSystem draggedScript = draggedObject.GetComponent<PAC_ItemSystem>();
+        draggedScript.index = this.index;
+        draggedScript.itemName = this.itemName;
+
         eventData.pointerDrag = draggedObject;
-        draggedScript.cGroup.alpha = 0.6f;
+
+        draggedScript.cGroup.alpha = 0.7f;
         draggedScript.cGroup.blocksRaycasts = false;
     }
 
@@ -44,13 +58,15 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
             eventData.pointerEnter.gameObject.CompareTag("Boiler") &&
             craftSystem.currentObjects.Count < 8)
         {
-            string cleanName = gameObject.name.Replace("_Dragged", "");
+            string cleanName = itemName.Replace("_Dragged", "");
 
             bool alreadyExists = false;
             foreach (var item in craftSystem.currentObjects)
             {
-                string itemCleanName = item.name.Replace("_Dragged", "");
-                if (itemCleanName == cleanName)
+                if (item == null) continue;
+
+                PAC_ItemSystem itemScript = item.GetComponent<PAC_ItemSystem>();
+                if (itemScript != null && itemScript.GetItemName().Replace("_Dragged", "") == cleanName)
                 {
                     alreadyExists = true;
                     break;
@@ -59,7 +75,7 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
 
             if (alreadyExists)
             {
-                Debug.Log("Bu item zaten var, eklenmiyor.");
+                Debug.Log("Item already exists!");
                 Destroy(gameObject);
                 return;
             }
@@ -68,13 +84,17 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
             craftSystem.contentsTxt.text = "Contents: " + craftSystem.currentObjects.Count;
             craftSystem.currentCombination[index] = true;
 
+            craftSystem.OnItemAdded(index, itemName);
+
             cGroup.alpha = 1f;
             cGroup.blocksRaycasts = true;
+
             StartCoroutine(FadeOut());
         }
         else if (craftSystem.currentObjects.Count >= 8)
         {
-            craftSystem.ResetSpeel();
+            Debug.Log("Cauldron full!");
+            craftSystem.ResetSpell();
             Destroy(gameObject);
         }
         else
@@ -99,8 +119,6 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
         cGroup.blocksRaycasts = false;
     }
 
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        Debug.Log("OnPointerDown");
-    }
+    public string GetItemName() => itemName;
+    public int GetIndex() => index;
 }

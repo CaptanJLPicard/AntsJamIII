@@ -4,39 +4,58 @@ using UnityEngine.UI;
 
 public class Character : MonoBehaviour
 {
-    [Header("Refenrences")]
+    [Header("References")]
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Animator animator;
     private CapsuleCollider2D gameObjectCollider;
     private SpriteRenderer gameObjectSprite;
 
     [Header("Side")]
-    [SerializeField] private bool isLeft;           
-    [SerializeField] private LayerMask hitLayers;   
-    [SerializeField] private int enemyLayerIndex;  
+    [SerializeField] private bool isLeft;
+    [SerializeField] private LayerMask hitLayers;
+    [SerializeField] private int enemyLayerIndex;
 
-    [Header("Variables")]
-    [SerializeField] private float characterSpeed = 2f;
+    [Header("Base Stats")]
+    [SerializeField] private float baseSpeed = 2f;
+    [SerializeField] private float baseDamage = 10f;
+    [SerializeField] private float baseHealth = 100f;
+    [SerializeField] private float baseAttackSpeed = 1f;
+
+    [Header("Current Stats")]
+    [SerializeField] private float characterSpeed;
+    [SerializeField] private float damage;
+    [SerializeField] private float health;
+    [SerializeField] private float attackSpeed;
     [SerializeField] private float hitDistance = 1f;
-    [SerializeField] private float attackSpeed = 1f;
     [SerializeField] private float attackTimer;
-    [SerializeField] private float damage = 10f;
-    [SerializeField] private float health = 100f;
-    [SerializeField] private int characterType; // Default = 0 //Ates = 1 //Su = 2 // Toprak = 3 // Hava = 4 //Elektrik
+    [SerializeField] private int characterType;
     [SerializeField] private string myTowerTag;
+
+    [Header("Multiplier Info")]
+    [SerializeField] private float appliedMultiplier = 1f;
+    [SerializeField] private bool isBuffed = false;
 
     private float currentCharacterSpeed;
     private bool isStopping;
     private bool isAttacing;
     private bool isDeath;
+    private float maxHealth;
 
     [Header("Audio")]
-    [SerializeField] private MMF_Player attackSound;   
+    [SerializeField] private MMF_Player attackSound;
     [SerializeField] private MMF_Player deathEffects;
 
     [Header("UI")]
     [SerializeField] private Slider healthSlider;
-    private float maxHealth;
+
+    private void Awake()
+    {
+        // Base deðerleri current deðerlere kopyala
+        characterSpeed = baseSpeed;
+        damage = baseDamage;
+        health = baseHealth;
+        attackSpeed = baseAttackSpeed;
+    }
 
     private void Start()
     {
@@ -53,6 +72,38 @@ public class Character : MonoBehaviour
             healthSlider.maxValue = maxHealth;
             healthSlider.value = health;
         }
+    }
+
+    /// <summary>
+    /// Brew sisteminden gelen multiplier'ý uygula
+    /// </summary>
+    public void ApplyMultiplier(float multiplier)
+    {
+        appliedMultiplier = multiplier;
+        isBuffed = multiplier > 1.05f;
+
+        // Statlarý multiplier ile çarp
+        damage = baseDamage * multiplier;
+        health = baseHealth * multiplier;
+        maxHealth = health;
+        characterSpeed = baseSpeed * Mathf.Sqrt(multiplier);
+        attackSpeed = baseAttackSpeed / Mathf.Sqrt(multiplier); // Daha hýzlý atak için bölüyoruz
+
+        // UI güncelle
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = health;
+        }
+
+        // Buffed ise scale biraz büyüt
+        if (isBuffed)
+        {
+            float scaleBonus = 1f + (multiplier - 1f) * 0.15f;
+            transform.localScale *= scaleBonus;
+        }
+
+        Debug.Log($"[{gameObject.name}] Multiplier applied: x{multiplier:F2} | DMG:{damage:F1} HP:{health:F1} SPD:{characterSpeed:F2}");
     }
 
     private void Update()
@@ -84,7 +135,6 @@ public class Character : MonoBehaviour
         scale.z = isLeft ? 1f : -1f;
         transform.localScale = scale;
     }
-
 
     private void Attack()
     {
@@ -130,7 +180,7 @@ public class Character : MonoBehaviour
                     }
 
                     BaseScripts baseSc = hit.collider.GetComponent<BaseScripts>();
-                    if(baseSc != null)
+                    if (baseSc != null)
                     {
                         baseSc.BaseDamage(damage);
                     }
@@ -152,18 +202,17 @@ public class Character : MonoBehaviour
         }
     }
 
-
     private void HealthCheck()
     {
         if (health <= 0f && !isDeath)
         {
             isDeath = true;
             deathEffects?.PlayFeedbacks();
-            gameObjectSprite.enabled = false; 
+            gameObjectSprite.enabled = false;
             gameObject.layer = 0;
             rb.gravityScale = 0;
             gameObjectCollider.enabled = false;
-            Destroy(gameObject , 1f);
+            Destroy(gameObject, 1f);
         }
     }
 
@@ -175,158 +224,97 @@ public class Character : MonoBehaviour
         }
     }
 
-
     public void Damage(float damageAmount, int enemyCharacterType)
     {
-        float baseDamage = health -= damageAmount;
+        float baseDamageAmount = damageAmount;
+        float multipliedDamage = baseDamageAmount;
+
         switch (characterType)
-         {
+        {
             case 0: // Default
                 switch (enemyCharacterType)
                 {
-                    case 0:
-                        health -= baseDamage * 1f;
-                        break;
-                    case 1:
-                        health -= baseDamage * 2f;
-                        break;
-                    case 2:
-                        health -= baseDamage * 2f;
-                        break;
-                    case 3:
-                        health -= baseDamage * 2f;
-                        break;
-                    case 4:
-                        health -= baseDamage * 2f;
-                        break;
-                    case 5:
-                        health -= baseDamage * 2f;
-                        break;
+                    case 0: multipliedDamage = baseDamageAmount * 1f; break;
+                    case 1: multipliedDamage = baseDamageAmount * 2f; break;
+                    case 2: multipliedDamage = baseDamageAmount * 2f; break;
+                    case 3: multipliedDamage = baseDamageAmount * 2f; break;
+                    case 4: multipliedDamage = baseDamageAmount * 2f; break;
+                    case 5: multipliedDamage = baseDamageAmount * 2f; break;
                 }
                 break;
-            case 1: //Ates
+            case 1: // Ates
                 switch (enemyCharacterType)
                 {
-                    case 0:
-                        health -= baseDamage * 0.25f;
-                        break;
-                    case 1:
-                        health -= baseDamage * 1f;
-                        break;
-                    case 2:
-                        health -= baseDamage * 0.5f;
-                        break;
-                    case 3:
-                        health -= baseDamage * 2f;
-                        break;
-                    case 4:
-                        health -= baseDamage * 1.5f;
-                        break;
-                    case 5:
-                        health -= baseDamage * 0.75f;
-                        break;
+                    case 0: multipliedDamage = baseDamageAmount * 0.25f; break;
+                    case 1: multipliedDamage = baseDamageAmount * 1f; break;
+                    case 2: multipliedDamage = baseDamageAmount * 0.5f; break;
+                    case 3: multipliedDamage = baseDamageAmount * 2f; break;
+                    case 4: multipliedDamage = baseDamageAmount * 1.5f; break;
+                    case 5: multipliedDamage = baseDamageAmount * 0.75f; break;
                 }
                 break;
-            case 2: //Su
+            case 2: // Su
                 switch (enemyCharacterType)
                 {
-                    case 0:
-                        health -= baseDamage * 0.25f;
-                        break;
-                    case 1:
-                        health -= baseDamage * 2f;
-                        break;
-                    case 2:
-                        health -= baseDamage * 1f;
-                        break;
-                    case 3:
-                        health -= baseDamage * 1.5f;
-                        break;
-                    case 4:
-                        health -= baseDamage * 0.75f;
-                        break;
-                    case 5:
-                        health -= baseDamage * 0.5f;
-                        break;
+                    case 0: multipliedDamage = baseDamageAmount * 0.25f; break;
+                    case 1: multipliedDamage = baseDamageAmount * 2f; break;
+                    case 2: multipliedDamage = baseDamageAmount * 1f; break;
+                    case 3: multipliedDamage = baseDamageAmount * 1.5f; break;
+                    case 4: multipliedDamage = baseDamageAmount * 0.75f; break;
+                    case 5: multipliedDamage = baseDamageAmount * 0.5f; break;
                 }
                 break;
-            case 3: //Toprak
+            case 3: // Toprak
                 switch (enemyCharacterType)
                 {
-                    case 0:
-                        health -= baseDamage * 1f;
-                        break;
-                    case 1:
-                        health -= baseDamage * 1.5f;
-                        break;
-                    case 2:
-                        health -= baseDamage * 0.5f;
-                        break;
-                    case 3:
-                        health -= baseDamage * 1f;
-                        break;
-                    case 4:
-                        health -= baseDamage * 0.75f;
-                        break;
-                    case 5:
-                        health -= baseDamage * 2f;
-                        break;
+                    case 0: multipliedDamage = baseDamageAmount * 1f; break;
+                    case 1: multipliedDamage = baseDamageAmount * 1.5f; break;
+                    case 2: multipliedDamage = baseDamageAmount * 0.5f; break;
+                    case 3: multipliedDamage = baseDamageAmount * 1f; break;
+                    case 4: multipliedDamage = baseDamageAmount * 0.75f; break;
+                    case 5: multipliedDamage = baseDamageAmount * 2f; break;
                 }
                 break;
-            case 4: //Hava
+            case 4: // Hava
                 switch (enemyCharacterType)
                 {
-                    case 0:
-                        health -= baseDamage * 0.25f;
-                        break;
-                    case 1:
-                        health -= baseDamage * 0.75f;
-                        break;
-                    case 2:
-                        health -= baseDamage * 2f;
-                        break;
-                    case 3:
-                        health -= baseDamage * 0.5f;
-                        break;
-                    case 4:
-                        health -= baseDamage * 1f;
-                        break;
-                    case 5:
-                        health -= baseDamage * 1.5f;
-                        break;
+                    case 0: multipliedDamage = baseDamageAmount * 0.25f; break;
+                    case 1: multipliedDamage = baseDamageAmount * 0.75f; break;
+                    case 2: multipliedDamage = baseDamageAmount * 2f; break;
+                    case 3: multipliedDamage = baseDamageAmount * 0.5f; break;
+                    case 4: multipliedDamage = baseDamageAmount * 1f; break;
+                    case 5: multipliedDamage = baseDamageAmount * 1.5f; break;
                 }
                 break;
-            case 5: //Elektrik
+            case 5: // Elektrik
                 switch (enemyCharacterType)
                 {
-                    case 0:
-                        health -= baseDamage * 0.25f;
-                        break;
-                    case 1:
-                        health -= baseDamage * 0.75f;
-                        break;
-                    case 2:
-                        health -= baseDamage * 1.5f;
-                        break;
-                    case 3:
-                        health -= baseDamage * 0.5f;
-                        break;
-                    case 4:
-                        health -= baseDamage * 2f;
-                        break;
-                    case 5:
-                        health -= baseDamage * 1f;
-                        break;
+                    case 0: multipliedDamage = baseDamageAmount * 0.25f; break;
+                    case 1: multipliedDamage = baseDamageAmount * 0.75f; break;
+                    case 2: multipliedDamage = baseDamageAmount * 1.5f; break;
+                    case 3: multipliedDamage = baseDamageAmount * 0.5f; break;
+                    case 4: multipliedDamage = baseDamageAmount * 2f; break;
+                    case 5: multipliedDamage = baseDamageAmount * 1f; break;
                 }
                 break;
             default:
-                health -= baseDamage * 1f;
+                multipliedDamage = baseDamageAmount * 1f;
                 break;
         }
+
+        health -= multipliedDamage;
     }
 
     private void AnimatorController()
     {
         animator.SetBool("Attack", isAttacing);
     }
+
+    // Getter methods
+    public float GetDamage() => damage;
+    public float GetHealth() => health;
+    public float GetMaxHealth() => maxHealth;
+    public float GetSpeed() => characterSpeed;
+    public float GetMultiplier() => appliedMultiplier;
+    public bool IsBuffed() => isBuffed;
 }

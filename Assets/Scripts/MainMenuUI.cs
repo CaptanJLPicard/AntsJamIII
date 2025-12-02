@@ -1,3 +1,4 @@
+using MoreMountains.Feedbacks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,13 +10,17 @@ public class MainMenuUI : MonoBehaviour
     private bool isSettingsActive;
     private bool isCreditsActive;
 
+    [SerializeField] private MMF_Player buttonClickSound;
+
     public void StartButton()
     {
+        buttonClickSound.PlayFeedbacks();
         SceneManager.LoadScene(1);
     }
 
     public void SettingsBtn()
     {
+        buttonClickSound.PlayFeedbacks();
         if (isSettingsActive)
         {
             SettingMenu.SetActive(false);
@@ -30,6 +35,7 @@ public class MainMenuUI : MonoBehaviour
 
     public void CredistMenu()
     {
+        buttonClickSound.PlayFeedbacks();
         if (isCreditsActive)
         {
             CreditsMenu.SetActive(false);
@@ -44,6 +50,7 @@ public class MainMenuUI : MonoBehaviour
 
     public void QuitButton()
     {
+        buttonClickSound.PlayFeedbacks();
         Application.Quit();
     }
 }
