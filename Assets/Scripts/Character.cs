@@ -43,6 +43,7 @@ public class Character : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] private MMF_Player attackSound;
+    [SerializeField] private MMF_Player castleHit;
     [SerializeField] private MMF_Player deathEffects;
 
     [Header("UI")]
@@ -63,6 +64,9 @@ public class Character : MonoBehaviour
         if (!animator) animator = GetComponent<Animator>();
         gameObjectCollider = GetComponent<CapsuleCollider2D>();
         gameObjectSprite = GetComponent<SpriteRenderer>();
+        attackSound = GameObject.Find("AttackSound").gameObject.GetComponent<MMF_Player>();
+        castleHit = GameObject.Find("CastleHitSound").gameObject.GetComponent<MMF_Player>();
+        deathEffects = GameObject.Find("DeathSounds").gameObject.GetComponent<MMF_Player>();
 
         attackTimer = attackSpeed;
 
@@ -151,8 +155,7 @@ public class Character : MonoBehaviour
 
             if (h.collider.gameObject == gameObject)
                 continue;
-            if (h.collider.gameObject.tag == myTowerTag)
-                continue;
+
 
             hit = h;
             found = true;
@@ -163,7 +166,10 @@ public class Character : MonoBehaviour
 
         if (found)
         {
-            isStopping = true;
+            if (hit.collider.gameObject.tag != myTowerTag)
+            {
+                isStopping = true;
+            }
 
             if (hit.collider.gameObject.layer == enemyLayerIndex)
             {
@@ -183,6 +189,7 @@ public class Character : MonoBehaviour
                     if (baseSc != null)
                     {
                         baseSc.BaseDamage(damage);
+                        castleHit?.PlayFeedbacks();
                     }
 
                     attackTimer = attackSpeed;

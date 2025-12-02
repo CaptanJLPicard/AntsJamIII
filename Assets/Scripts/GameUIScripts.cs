@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameUIScripts : MonoBehaviour
 {
@@ -6,6 +7,7 @@ public class GameUIScripts : MonoBehaviour
 
     [SerializeField] private Vector2 bigSize = new Vector2(1920f, 1080f);
     [SerializeField] private Vector2 smallSize = new Vector2(400f, 225f);
+
 
     private void Start()
     {
@@ -26,5 +28,22 @@ public class GameUIScripts : MonoBehaviour
         {
             targetRect.sizeDelta = smallSize;
         }
+    }
+
+    public void Restart()
+    {
+        int currentIndex = SceneManager.GetActiveScene().buildIndex;
+
+        SceneManager.LoadScene(currentIndex);
+    }
+
+    public void NextLevel(int whichSceneIndex)
+    {
+        SceneManager.LoadScene(whichSceneIndex);
+    }
+
+    public void Menu()
+    {
+        SceneManager.LoadScene(0);
     }
 }

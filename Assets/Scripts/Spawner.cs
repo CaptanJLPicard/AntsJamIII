@@ -1,3 +1,4 @@
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
@@ -12,6 +13,13 @@ public class Spawner : MonoBehaviour
     [Header("Current State")]
     [SerializeField] private int currentSoldierIndex = 0;
     [SerializeField] private float pendingMultiplier = 1f;
+
+    [Header("Feedbacks")]
+    [SerializeField] private MMF_Player atesAskerSpawnFeedback;
+    [SerializeField] private MMF_Player suAskerSpawnFeedback;
+    [SerializeField] private MMF_Player toprakAskerSpawnFeedback;
+    [SerializeField] private MMF_Player havaAskerSpawnFeedback;
+    [SerializeField] private MMF_Player elektrikAskerSpawnFeedback;
 
     private void Start()
     {
@@ -58,6 +66,25 @@ public class Spawner : MonoBehaviour
         {
             Debug.LogWarning($"Invalid soldier index: {currentSoldierIndex}");
             currentSoldierIndex = 0;
+        }
+
+        switch (currentSoldierIndex)
+        {
+            case 1:
+                atesAskerSpawnFeedback.PlayFeedbacks();
+                break;
+            case 2:
+                suAskerSpawnFeedback.PlayFeedbacks();
+                break;
+            case 3:
+                toprakAskerSpawnFeedback.PlayFeedbacks();
+                break;
+            case 4:
+                havaAskerSpawnFeedback.PlayFeedbacks();
+                break;
+            case 5:
+                elektrikAskerSpawnFeedback.PlayFeedbacks();
+                break;
         }
 
         GameObject spawnedSoldier = Instantiate(

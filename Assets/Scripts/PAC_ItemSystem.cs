@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using MoreMountains.Feedbacks;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -14,6 +15,10 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
     private RectTransform rectTransform;
     private CanvasGroup cGroup;
 
+    [Header("Feedbacks")]
+    [SerializeField] private MMF_Player itemDropFeedback;
+    [SerializeField] private MMF_Player itemGrapFeedback;
+
     private void Awake()
     {
         craftSystem = FindAnyObjectByType<PAC_CraftSystem>();
@@ -21,6 +26,8 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
         image = GetComponent<Image>();
         cGroup = GetComponent<CanvasGroup>();
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+        itemDropFeedback = GameObject.Find("ItemDropSound").GetComponent<MMF_Player>();
+        itemGrapFeedback = GameObject.Find("ItemGrap").GetComponent<MMF_Player>();
 
         if (string.IsNullOrEmpty(itemName))
             itemName = gameObject.name;
@@ -45,6 +52,7 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
 
         draggedScript.cGroup.alpha = 0.7f;
         draggedScript.cGroup.blocksRaycasts = false;
+        itemDropFeedback.PlayFeedbacks();
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -54,6 +62,7 @@ public class PAC_ItemSystem : MonoBehaviour, IPointerDownHandler, IBeginDragHand
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        itemGrapFeedback.PlayFeedbacks();
         if (eventData.pointerEnter != null &&
             eventData.pointerEnter.gameObject.CompareTag("Boiler") &&
             craftSystem.currentObjects.Count < 8)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MoreMountains.Feedbacks;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -11,6 +12,7 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
     [Header("UI References")]
     public TextMeshProUGUI contentsTxt;
     public TextMeshProUGUI brewTimeTxt;
+    public TextMeshProUGUI chaosTxt;
     public TextMeshProUGUI statusMessageTxt;
     public Image brewProgressBar;
 
@@ -38,6 +40,10 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
     [SerializeField] private int comboCount = 0;
     [SerializeField] private float comboMultiplier = 1f;
     [SerializeField] private float maxComboMultiplier = 2f;
+
+    [Header("Feedbacks")]
+    [SerializeField] private MMF_Player successFeedback;
+    [SerializeField] private MMF_Player unSuccessFeedback;
 
     [System.Serializable]
     public class Combinations
@@ -91,6 +97,7 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
         if (chaos < maxChaos)
             chaos += Time.deltaTime * increaseChaosSpeed;
         chaos = Mathf.Clamp(chaos, minChaos, maxChaos);
+        chaosTxt.text = "Chaos: " + chaos.ToString("f0");
     }
 
     private void UpdateStatusMessage()
@@ -142,6 +149,7 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
             if (brewTime > maxBrewTime)
             {
                 ShowStatusMessage("Spell ruined! Waited too long.", Color.red);
+                unSuccessFeedback.PlayFeedbacks();
                 ResetSpell();
             }
         }
@@ -235,6 +243,7 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
         if (currentObjects.Count == 0)
         {
             ShowStatusMessage("Cauldron is empty!", Color.yellow);
+            unSuccessFeedback.PlayFeedbacks();
             return;
         }
 
@@ -243,6 +252,7 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
         if (chaos < requiredChaos)
         {
             ShowStatusMessage("Not enough energy!", Color.red);
+            unSuccessFeedback.PlayFeedbacks();
             return;
         }
 
@@ -257,7 +267,21 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
         spawner.SpawnWithMultiplier(currentComboIndex, finalMultiplier);
 
         string bonusText = finalMultiplier > 1f ? $" (x{finalMultiplier:F1} power!)" : "";
-        ShowStatusMessage($"Spell success!{bonusText}", Color.green);
+        if (bonusText == "" && finalMultiplier > 0)
+        {
+            ShowStatusMessage("Too early! Weak spell.", Color.red);
+            successFeedback.PlayFeedbacks();
+        }
+        else if (bonusText == "")
+        {
+            ShowStatusMessage($"Spell Unsuccess!{bonusText}", Color.green);
+            unSuccessFeedback.PlayFeedbacks();
+        }
+        else
+        {
+            ShowStatusMessage($"Spell success!{bonusText}", Color.green);
+            unSuccessFeedback.PlayFeedbacks();
+        }
         OnSpellSuccess?.Invoke(finalMultiplier);
 
         ResetSpell();
