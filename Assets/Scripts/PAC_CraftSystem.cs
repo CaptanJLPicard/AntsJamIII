@@ -274,12 +274,12 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
         }
         else if (bonusText == "")
         {
-            ShowStatusMessage($"Spell Unsuccess!{bonusText}", Color.green);
+            ShowStatusMessage($"Spell Unsuccess!", Color.green);
             unSuccessFeedback.PlayFeedbacks();
         }
         else
         {
-            ShowStatusMessage($"Spell success!{bonusText}", Color.green);
+            ShowStatusMessage($"Spell success!", Color.green);
             unSuccessFeedback.PlayFeedbacks();
         }
         OnSpellSuccess?.Invoke(finalMultiplier);
@@ -295,7 +295,7 @@ public class PAC_CraftSystem : MonoBehaviour, IDropHandler
 
         if (brewTime >= optimalBrewTimeMin && brewTime <= optimalBrewTimeMax)
         {
-            ShowStatusMessage("PERFECT TIMING!", Color.cyan);
+            ShowStatusMessage("Perfect Timing!", Color.cyan);
             return perfectBrewBonus;
         }
         else if (brewTime < optimalBrewTimeMin)
