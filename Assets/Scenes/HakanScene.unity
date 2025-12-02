@@ -329,7 +329,7 @@ Transform:
   m_GameObject: {fileID: 94734308}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 24, y: -9.5, z: 0}
+  m_LocalPosition: {x: 27.5, y: -9.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1996,7 +1996,7 @@ GameObject:
   - component: {fileID: 801169095}
   m_Layer: 6
   m_Name: Base
-  m_TagString: Untagged
+  m_TagString: MyTower
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3816,23 +3816,23 @@ MonoBehaviour:
     isThisOk: 0
     hwmuchChaos: 0
   - spellName: AtesIksiri
-    combination: 0100000001000001
+    combination: 0001000000010100
     isThisOk: 0
     hwmuchChaos: 15
-  - spellName: ToprakIksiri
-    combination: 0101000000010000
+  - spellName: SuIksiri
+    combination: 0100000101000001
     isThisOk: 0
     hwmuchChaos: 25
-  - spellName: SuIksiri
+  - spellName: ToprakIksiri
     combination: 0000010100010100
     isThisOk: 0
     hwmuchChaos: 20
   - spellName: HavaIksiri
-    combination: 0000010100000100
+    combination: 0100010000010001
     isThisOk: 0
     hwmuchChaos: 50
   - spellName: ElektrikIksiri
-    combination: 0101010000000001
+    combination: 0001010001000101
     isThisOk: 0
     hwmuchChaos: 60
   currentCombination: 0000000000000000
@@ -4929,7 +4929,7 @@ GameObject:
   - component: {fileID: 2025003207}
   m_Layer: 7
   m_Name: EnemyBase
-  m_TagString: Untagged
+  m_TagString: EnemyTower
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5095,7 +5095,7 @@ Transform:
   m_GameObject: {fileID: 2091929705}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -24, y: -9.5, z: 0}
+  m_LocalPosition: {x: -27.5, y: -9.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

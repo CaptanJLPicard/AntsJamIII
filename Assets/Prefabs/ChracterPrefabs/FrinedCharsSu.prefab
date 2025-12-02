@@ -293,6 +293,7 @@ MonoBehaviour:
   damage: 10
   health: 50
   characterType: 2
+  myTowerTag: MyTower
   attackSound: {fileID: 0}
   deathEffects: {fileID: 0}
   healthSlider: {fileID: 7316433069772536411}

@@ -23,6 +23,7 @@ public class Character : MonoBehaviour
     [SerializeField] private float damage = 10f;
     [SerializeField] private float health = 100f;
     [SerializeField] private int characterType; // Default = 0 //Ates = 1 //Su = 2 // Toprak = 3 // Hava = 4 //Elektrik
+    [SerializeField] private string myTowerTag;
 
     private float currentCharacterSpeed;
     private bool isStopping;
@@ -99,6 +100,8 @@ public class Character : MonoBehaviour
             if (h.collider == null) continue;
 
             if (h.collider.gameObject == gameObject)
+                continue;
+            if (h.collider.gameObject.tag == myTowerTag)
                 continue;
 
             hit = h;
