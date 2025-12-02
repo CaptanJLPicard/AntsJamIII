@@ -160,7 +160,7 @@ public class Character : MonoBehaviour
             gameObject.layer = 0;
             rb.gravityScale = 0;
             gameObjectCollider.enabled = false;
-            Destroy(gameObject , 3f);
+            Destroy(gameObject , 1f);
         }
     }
 
